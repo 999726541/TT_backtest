@@ -65,7 +65,7 @@ class Content():
             if i.Symbol not in self.allStocks:
                 self.allStocks.append(i.Symbol)
 
-        new_add = pd.DataFrame({'TS':[timestamp],'CASH':[cash],'EQUITY':[equity],'allStocks':[dic]},index=[timestamp])
+        new_add = pd.DataFrame({'TS':[timestamp],'CASH':[cash],'EQUITY':[equity],'portfolio':[dic]},index=[timestamp])
         if self.length == 0:
             self.df = new_add
 
@@ -97,6 +97,7 @@ if __name__=="__main__":
     record1 = Records('APPL','0.5','99','99','100')
     record2 = Records('APL','0.5','99','99','100')
     event.add('1',[record1,record2],'10000','10000')
+    event.add('2', [record1, record2], '10000', '10000')
     #event.add('2',[record2],'10000','10000')
     #event.add('2', 'APL', '0.5', '99', '99', '100', '10000', '10000')
     print(event.df)

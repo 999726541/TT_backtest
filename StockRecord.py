@@ -59,4 +59,3 @@ class Records():
 if __name__=="__main__":
     record = Records(symbol='APPL',position='0.5',NumOfShare='100',average_cost='120',lastprice='121')
     print(record)
-    
