@@ -71,6 +71,12 @@ class MONGODB():
         db[collection].update({'_id':id},{'$set':dic},True)
         self._client.close()
 
+    def read_origin(self, collection, query=None, no_id=True):
+        cursor = self.conn[collection].find(query)
+        print('getting data...')
+        # Expand the cursor and construct the DataFrame
+        self._client.close()
+        return [i for i in cursor]
 
 
 
