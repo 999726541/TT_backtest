@@ -21,8 +21,10 @@ class Basic_strategy():
             # This is float
         #   Content is a data frame
 
+    def display_all_content(self):
+        return self._newStrategy.df
 
-    def data_handler(self,**kwargs): # @TODO
+    def data_handler(self,**kwargs):
         """
 
         Fetch data from DataBase
@@ -38,7 +40,7 @@ class Basic_strategy():
         AveragePrice(t)
         LastPrice(t)
         """
-        pass
+        raise NotImplementedError
 
     def long_short_signal(self,listOfRecords:[Records]):
         """
@@ -138,23 +140,18 @@ class Basic_strategy():
 
         if self._newStrategy.length == 0:
             # Check if this is the first data come in
-            last_Cash = self._initialCash
-            last_portfolio = []
-            total_change_value = []
+            raise notInitiateError
         else:
             last_records = self.get_last_row()
-            last_Cash = last_records['CASH']
-            last_portfolio = last_records['portfolio']  # This is a dictionary
+            last_Cash = last_records['CASH'].item()
+            last_portfolio = last_records['portfolio'].item()  # This is a dictionary
             total_change_value = []
         for element in updated_listOfRecord:
-            if element.Symbol not in last_portfolio:
-                total_change_value.append(0 - element.NumOfShare*element.AverageCost)
-            else:
-                total_change_value.append((last_portfolio[element.Symbol].NumOfShare - element.NumOfShare) * element.AverageCost)
+            total_change_value.append((last_portfolio[element.Symbol].NumOfShare - element.NumOfShare) * element.AverageCost)
 
         return last_Cash + sum(total_change_value)
 
-    def _equity_calculate(self,updated_listOfRecord:[Records],last_cash):
+    def _equity_calculate(self,updated_listOfRecord:[Records],current_cash):
         """
         Equity = Cash(t) + sum(NumOfStock(t)*Price(t))
         :param updated_listOfRecord:
@@ -168,10 +165,10 @@ class Basic_strategy():
         """
         total_value = []
         for element in updated_listOfRecord:
-            total_value.append(element.NumOfShare*element.AverageCost)
-        return sum(total_value) + last_cash
+            total_value.append(element.NumOfShare*element.LastPrice)
+        return sum(total_value) + current_cash
 
-    def stop_loss_win(self,listOfRecord:[Records],**stop_ratio):
+    def stop_loss_win(self,listOfRecord:[Records],stop_ratio):
         """
         Here implement your stop loss and win strategy, this will be claculated after your stock change
         If Triggered, it will override the Long Short signal
@@ -192,6 +189,7 @@ class Basic_strategy():
             underlying_value.append(element.NumOfShare * element.LastPrice)
             NumShares[element.Symbol] = -element.NumOfShare
         ratio = (last_cash+ sum(underlying_value))/last_equity  # Calculate equity ratio compare to last time
+        print(ratio)
         if ratio <= stop_ratio:
             return NumShares
         else:
@@ -216,13 +214,14 @@ class Basic_strategy():
                 return True
         return False
 
-
     def event_handler(self,quantity,cal_style,timeStamp,row_data): # row_data: Generate a List of Records
-        checkLost = self.stop_loss_win(row_data)    # Generate dictionary Tell me how many shares you need to sell
+        checkLost = self.stop_loss_win(row_data,stop_ratio=0.95)    # Generate dictionary Tell me how many shares you need to sell
+        # step 1 check lost win
         if checkLost != None:
+            print('stop lost,ratio:', checkLost)
             signal = {}
             for element in row_data:
-                signal[element.Symbol] = -1
+                signal[element.Symbol] = 1
             updated_record = self._record_update(checkLost,row_data,signal)
         else:
             signal = self.long_short_signal(row_data)
@@ -230,21 +229,20 @@ class Basic_strategy():
             updated_record = self._record_update(position_change,row_data,signal)
 
         updated_cash = self._cash_calculate(updated_record)
-        updated_equity = self._equity_calculate(updated_record,self.get_last_row()['CASH'])
+        updated_equity = self._equity_calculate(updated_record,updated_cash)
         self._newStrategy.add(timestamp=timeStamp,listOfRecords=updated_record,cash=updated_cash,equity=updated_equity)
-
 
     def get_last_row(self):
         """
         If this is first row return None
-         >>> testt = Basic_strategy(100000)
+         >>> testt = Basic_strategy()
          >>> testt.get_last_row()
 
         """
 
         last_row = self._newStrategy.get_ContentDataFrame()[-1:]
         if len(last_row) == 0:
-            return None
+            raise notInitiateError
         else:
             return last_row
 
@@ -265,6 +263,10 @@ class Basic_strategy():
         for element in last_port:
             dic[element] = last_port[element].NumOfShare
         return dic
+
+    def append(self,timeStamp,updated_record,updated_cash,updated_equity):
+        self._newStrategy.add(timestamp=timeStamp, listOfRecords=updated_record, cash=updated_cash,
+                              equity=updated_equity)
 
 if __name__=='__main__':
     testt = Basic_strategy()

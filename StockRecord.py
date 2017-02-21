@@ -50,7 +50,7 @@ class Records():
         return self.Symbol
 
     def display_all(self):
-        return ('\n'+'Symbol:'+self.Symbol+'\n'+'Position: '+str(self.Position) +'\n'
+        return ('\n'+'Symbol:'+self.Symbol +'\n'
                 + 'NumOfShare: '+str(self.NumOfShare) + '\n' + 'AverageCost: '+str(self.AverageCost) + '\n'+
                 'LastPrice: '+ str(self.LastPrice) + '\n'
                 )
