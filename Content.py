@@ -52,15 +52,16 @@ class Content():
     def __init__(self):
         self.length = 0
         self.allStocks = []
+        self.df = pd.DataFrame()
 
 
-    def add(self,timestamp,records:[Records],cash,equity):
+    def add(self, timestamp:int, listOfRecords:[Records], cash:float, equity:float):
         """
         !!!!!!!!!!!!There is one target under each timestamp!!!!!!!!!!!!!
 
         """
         dic = {}
-        for i in records:
+        for i in listOfRecords:
             dic[i.Symbol]=i
             if i.Symbol not in self.allStocks:
                 self.allStocks.append(i.Symbol)
@@ -83,6 +84,13 @@ class Content():
         :return:
         """
         self.df = self.df[1:]
+
+    def get_ContentDataFrame(self):
+        """
+        return updated dataframe of content
+        :return:
+        """
+        return self.df
 
 
 

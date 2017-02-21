@@ -38,9 +38,9 @@ class Records():
     LastPrice:
     '''
 
-    def __init__(self,symbol,position,NumOfShare,average_cost,lastprice):
+    def __init__(self,symbol:str,NumOfShare:int,average_cost:float,lastprice:float):
+        isinstance(symbol,str)
         self.Symbol = symbol
-        self.Position = position
         self.NumOfShare = NumOfShare
         self.AverageCost = average_cost
         self.LastPrice = lastprice
@@ -48,10 +48,12 @@ class Records():
     def __str__(self):
 
         return self.Symbol
-        #return ('\n'+'Symbol:'+self.Symbol+'\n'+'Position: '+self.Position +'\n'
-        #        + 'NumOfShare: '+self.NumOfShare + '\n' + 'AverageCost: '+self.AverageCost + '\n'+
-        #        'LastPrice: '+ self.LastPrice + '\n'
-        #        )
+
+    def display_all(self):
+        return ('\n'+'Symbol:'+self.Symbol+'\n'+'Position: '+str(self.Position) +'\n'
+                + 'NumOfShare: '+str(self.NumOfShare) + '\n' + 'AverageCost: '+str(self.AverageCost) + '\n'+
+                'LastPrice: '+ str(self.LastPrice) + '\n'
+                )
 
 
 
